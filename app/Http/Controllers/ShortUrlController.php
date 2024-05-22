@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ShortUrl;
 use App\Http\Requests\StoreShortUrlRequest;
 use App\Http\Requests\UpdateShortUrlRequest;
+use App\Services\ShortUrlService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Validator;
@@ -32,7 +33,7 @@ class ShortUrlController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, ShortUrlService $shortUrlService)
     {
 
         $validator = Validator::make($request->all(), [
@@ -41,16 +42,9 @@ class ShortUrlController extends Controller
 
         if ($validator->passes()) {
 
-            $input['full_link'] = $request->full_link;
-            $input['short_url'] = env('SHORT_URL');
-            $input['short_code'] = ShortUrl::StrRandom();
-            ShortUrl::create($input);
+            $urlListHTML = $shortUrlService->createShortUrl($request);
 
-            $data = ShortUrl::orderBy('id', 'DESC')->limit(10)->get();
-
-            $returnHTML = view("dt-table", compact('data'))->render();
-
-            return response()->json(['ht' => $returnHTML, 'success'=>'Shorten Link Generated Successfully!']);
+            return response()->json(['ht' => $urlListHTML, 'success'=>'Shorten Link Generated Successfully!']);
         }
 
         return response()->json(['error'=>$validator->errors()->all()]);

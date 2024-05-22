@@ -24,17 +24,5 @@ class ShortUrl extends Model
         'updated_at',
     ];
 
-
-    public static function strRandom(): string
-    {
-        $i = "a";
-        $data = ShortUrl::orderBy('id', 'DESC')->limit(1)->get();
-
-        if ($data) {
-            $i = $data[0]->short_code;
-        }
-
-        return ++$i;
-    }
 }
 
